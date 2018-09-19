@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JenkinsCSharpSample.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -10,21 +11,30 @@ namespace JenkinsCSharpSample.Controllers
     {
         public ActionResult Index()
         {
-            return View();
+            var model = new ShoppingCart();
+            model.Price = 100;
+            model.Qty = 1;
+
+            return View(model);
         }
 
-        public ActionResult About()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Index(ShoppingCart model)
         {
-            ViewBag.Message = "Your application description page.";
+            var totalPrice = model.Price * model.Qty;
+            if (model.MemberType == MemberType.Normal && totalPrice > 1000)
+            {
+                totalPrice = totalPrice * 0.8m;
+            }
+            else if (model.MemberType == MemberType.VIP && totalPrice > 500)
+            {
+                totalPrice = totalPrice * 0.7m;
+            }
 
-            return View();
-        }
+            model.TotalPrice = totalPrice;
 
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
-
-            return View();
+            return View(model);
         }
     }
 }
